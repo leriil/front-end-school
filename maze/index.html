@@ -260,7 +260,7 @@
       const pieceElement = document.querySelector('.piece');
       const directionNames = ['up', 'right', 'down', 'left'];
       let stepper;
-      //у поля есть поле, клетки, противоположные направления
+
       class Field {
         constructor() {
           this.field = fieldElement;
@@ -272,7 +272,7 @@
             right: 'left',
           };
         }
-        //true/false в зависимости от того, распологаются ли клетки в одной строке
+
         onTheSameRow(current, next) {
           return (current - (current % 10)) / 10 === (next - (next % 10)) / 10;
         }
@@ -281,28 +281,27 @@
           let nextIndex = currentIndex;
 
           switch (direction) {
-            //возвращает -1 если выше клетки нет, либо номер следующей клетки выше
             case 'up':
               nextIndex = currentIndex - 10;
               if (nextIndex < 0) {
                 nextIndex = -1;
               }
               break;
-            //возвращает номер следующей клетки справа или -1, если этот номер оказался не в той же строке
+
             case 'right':
               nextIndex = currentIndex + 1;
               if (!this.onTheSameRow(currentIndex, nextIndex)) {
                 nextIndex = -1;
               }
               break;
-            //возвращает -1 если выше клетки нет, либо номер следующей клетки ниже
+
             case 'down':
               nextIndex = currentIndex + 10;
               if (nextIndex > 100) {
                 nextIndex = -1;
               }
               break;
-            //возвращает номер следующей клетки слева или -1, если этот номер оказался не в той же строке
+
             case 'left':
               nextIndex = currentIndex - 1;
               if (!this.onTheSameRow(currentIndex, nextIndex)) {
@@ -314,16 +313,15 @@
               nextIndex = -1;
               break;
           }
-          //вернет undefined если клетки нет, либо номер следующей клетки
+
           return this.cells[nextIndex];
         }
-        //по текущему номеру клетки и направлению фигурки определяет, есть ли на пути стена
+
         isTheWallThere(position, direction) {
           let cellIndex = position.top * 10 + position.left;
           let cell = this.cells[cellIndex];
           let nextCell = this.findNextCell(cellIndex, direction);
-          //   console.log(cell.classList.toString());
-          // console.log(cell.classList.toString().indexOf(direction));
+
           return (
             cell.classList.toString().indexOf(direction) !== -1 ||
             typeof nextCell === 'undefined' ||
@@ -332,35 +330,35 @@
           );
         }
       }
-      //создает поле
+
       function createPiece() {
         let field = new Field();
-        //меняет направление на 90 градусов (по часовой стрелке)
+
         let rotatePiece = direction => {
           let dir = direction;
-          //записывает в ходы поворот фишки
+
           moves.unshift(function() {
             pieceElement.style.transform = 'rotate(' + dir * 90 + 'deg)';
           });
         };
-        //меняет позицию фишки
+
         let movePiece = position => {
           let top = position.top * 50;
           let left = position.left * 50;
-          //записывает в ходы изменение позиции фишки
+
           moves.unshift(function() {
             pieceElement.style.top = top + 'px';
             pieceElement.style.left = left + 'px';
           });
         };
-        //возвращает true, если фишка стоит на выигрышной клетке
+
         let isPieceOut = () => {
           return (
             pieceElement.style.top === '450px' &&
             pieceElement.style.left === '0px'
           );
         };
-        // задает рандомно направление и положение фишки
+
         let direction = Math.floor(Math.random() * directionNames.length);
         let stepsCount = 0;
         let turnsCount = 0;
@@ -371,7 +369,6 @@
         };
 
         let piecePublicApi = {
-          //возращает true если нет стены и есть следующая свободная клетка
           isThereWay() {
             const isTheWallThere = field.isTheWallThere(
               position,
@@ -379,14 +376,14 @@
             );
             return !isTheWallThere;
           },
-          //меняет направление фишки но не передвигает
+
           turnLeft() {
             turnsCount += 1;
             direction -= 1;
             direction = direction < 0 ? 3 : direction;
             rotatePiece(direction);
           },
-          //меняет направление фишки но не передвигает
+
           turnRight() {
             turnsCount += 1;
             direction += 1;
@@ -396,11 +393,11 @@
 
           goForward() {
             stepsCount += 1;
-            //если нет следующей клетки или есть стена, вернет false
+
             if (!this.isThereWay()) {
               return false;
             }
-            //меняет позицию клетки в зависимости от направления
+
             switch (direction) {
               case 0:
                 position.top -= 1;
@@ -417,26 +414,18 @@
               default:
                 return false;
             }
-            //двигает фишку в нужном направлении (должно быть видно)
             movePiece(position);
           },
-          //=isPieceOut() - true/false - ориентир на выигрышную клетку
+
           amIFree() {
             return isPieceOut();
           },
         };
-        //с интервалом 200мс выполняются след действия
+
         stepper = setInterval(() => {
-          //возращает последний элемент массива
-          // console.log('internval');
-          // console.log(Date.now());
           let nextMove = moves.pop();
-          console.log(moves);
-          //если это функция - вызывает ee, иначе проверяет вышла ли фишка из лабиринта
-          //если вышла, появляется сообщение 'success', если не вышла 'fail'
           if (typeof nextMove === 'function') {
             nextMove();
-            // console.log(Date.now());
           } else {
             let success = isPieceOut();
 
@@ -447,7 +436,6 @@
               result.textContent = failResult;
               result.classList.remove(successModifier);
             }
-            //убирает таймер и выводит в консоль количество шагов и поворотов
             clearInterval(stepper);
             console.log({ stepsCount, turnsCount });
           }
@@ -498,7 +486,6 @@
             }
           }, 150);
         };
-        // вызов
         makeAMove();
       }
 
